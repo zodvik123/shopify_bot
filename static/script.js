@@ -1,7 +1,8 @@
 // ROBIN Mini App JavaScript
 class RobinApp {
     constructor() {
-        this.userId = this.getUserId();
+        this.sessionId = window.ROBIN_SESSION_ID || null;
+        this.userId = window.ROBIN_USER_ID || this.getUserId();
         this.isChecking = false;
         this.isPaused = false;
         this.checkingInterval = null;
@@ -13,7 +14,51 @@ class RobinApp {
         return urlParams.get('user_id') || '123456789'; // Default for testing
     }
 
-    init() {
+    async validateSession() {
+        if (!this.sessionId) {
+            this.showAuthError();
+            return false;
+        }
+
+        try {
+            const response = await fetch(`/api/validate-session/${this.sessionId}`);
+            if (!response.ok) {
+                this.showAuthError();
+                return false;
+            }
+            return true;
+        } catch (error) {
+            console.error('Session validation error:', error);
+            this.showAuthError();
+            return false;
+        }
+    }
+
+    showAuthError() {
+        document.body.innerHTML = `
+            <div class="auth-error">
+                <i class="fas fa-shield-alt" style="font-size: 3rem; color: var(--robin-red); margin-bottom: 1rem;"></i>
+                <h2>🔒 Session Expired</h2>
+                <p>Your session has expired or is invalid.</p>
+                <p>Please restart the bot in Telegram to get a new access link.</p>
+                <a href="https://t.me/your_bot_username" class="btn btn-primary">
+                    <i class="fab fa-telegram"></i>
+                    Open ROBIN Bot
+                </a>
+            </div>
+        `;
+    }
+
+    getAuthHeaders() {
+        return this.sessionId ? { 'Authorization': `Bearer ${this.sessionId}` } : {};
+    }
+
+    async init() {
+        // Validate session first
+        if (this.sessionId && !(await this.validateSession())) {
+            return;
+        }
+
         this.setupEventListeners();
         this.loadUserData();
         this.loadSettings();
@@ -102,7 +147,13 @@ class RobinApp {
 
     async loadUserData() {
         try {
-            const response = await fetch(`/api/user-data/${this.userId}`);
+            const url = this.sessionId 
+                ? `/api/user-data/${this.userId}?session_id=${this.sessionId}`
+                : `/api/user-data/${this.userId}`;
+            
+            const response = await fetch(url, {
+                headers: this.getAuthHeaders()
+            });
             const data = await response.json();
             
             if (data.user) {
@@ -303,11 +354,20 @@ class RobinApp {
         this.resetResults();
         
         try {
-            // Start checking process
+            // Start real Shopify checking process
+            const requestBody = { 
+                user_id: this.userId, 
+                cards,
+                session_id: this.sessionId
+            };
+
             const response = await fetch('/api/check-cards', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: this.userId, cards })
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...this.getAuthHeaders()
+                },
+                body: JSON.stringify(requestBody)
             });
             
             if (response.ok) {

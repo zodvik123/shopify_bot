@@ -412,3 +412,124 @@ class CardChecker:
         user_id_str = str(user_id)
         if user_id_str in self.checking_status:
             self.checking_status[user_id_str]['is_running'] = False
+
+    async def check_cards_real(self, user_id, cards):
+        """Check multiple cards against real Shopify stores with enhanced error detection"""
+        try:
+            results = {
+                'live': [],
+                'dead': [],
+                'error': [],
+                'total': len(cards),
+                'checked': 0,
+                'status': 'Starting real Shopify checking...',
+                'current_card': '',
+                'previous_card': ''
+            }
+            
+            # Store initial results
+            self.results[user_id] = results
+            
+            # Get user's active Shopify URL
+            from database import Database
+            db = Database()
+            user_data = await db.get_user_data(user_id)
+            shopify_url = user_data.get('settings', {}).get('active_shopify_url')
+            proxies = user_data.get('proxies', [])
+            
+            if not shopify_url:
+                return {
+                    'error': 'No active Shopify URL configured',
+                    'live': [],
+                    'dead': [],
+                    'error': [],
+                    'total': len(cards),
+                    'checked': 0,
+                    'status': 'Error'
+                }
+            
+            logger.info(f"Starting real card checking for {len(cards)} cards against {shopify_url}")
+            
+            # Process cards one by one
+            for i, card in enumerate(cards):
+                try:
+                    results['current_card'] = card
+                    results['status'] = f"Checking card {i + 1}/{len(cards)} against Shopify..."
+                    
+                    # Select proxy if available
+                    proxy = None
+                    if proxies:
+                        proxy_string = proxies[i % len(proxies)]
+                        proxy_parts = proxy_string.split(':')
+                        if len(proxy_parts) == 4:
+                            proxy = {
+                                'host': proxy_parts[0],
+                                'port': int(proxy_parts[1]),
+                                'username': proxy_parts[2],
+                                'password': proxy_parts[3]
+                            }
+                    
+                    # Real Shopify card checking
+                    start_time = asyncio.get_event_loop().time()
+                    result = await self.check_single_card(user_id, card, shopify_url, proxy)
+                    end_time = asyncio.get_event_loop().time()
+                    response_time = round((end_time - start_time) * 1000)  # Convert to ms
+                    
+                    result['response_time'] = response_time
+                    
+                    logger.info(f"Card {card} result: {result['status']} - {result['message']}")
+                    
+                    # Update results based on response
+                    if result['status'] == 'LIVE':
+                        results['live'].append({
+                            'card': card,
+                            'message': result['message'],
+                            'response_time': response_time
+                        })
+                    elif result['status'] == 'DEAD':
+                        results['dead'].append({
+                            'card': card,
+                            'message': result['message'],
+                            'response_time': response_time
+                        })
+                    else:
+                        results['error'].append({
+                            'card': card,
+                            'message': result['message'],
+                            'response_time': response_time
+                        })
+                    
+                    results['previous_card'] = card
+                    results['checked'] = i + 1
+                    
+                    # Add delay between requests to avoid rate limiting
+                    await asyncio.sleep(3)
+                    
+                except Exception as e:
+                    logger.error(f"Error checking card {card}: {e}")
+                    results['error'].append({
+                        'card': card,
+                        'message': f"Shopify checking error: {str(e)}",
+                        'response_time': 0
+                    })
+                    results['previous_card'] = card
+                    results['checked'] = i + 1
+            
+            results['status'] = 'Completed'
+            results['current_card'] = ''
+            
+            logger.info(f"Card checking completed. Live: {len(results['live'])}, Dead: {len(results['dead'])}, Error: {len(results['error'])}")
+            
+            return results
+            
+        except Exception as e:
+            logger.error(f"Error in check_cards_real: {e}")
+            return {
+                'error': str(e),
+                'live': [],
+                'dead': [],
+                'error': [],
+                'total': len(cards),
+                'checked': 0,
+                'status': 'Error'
+            }
