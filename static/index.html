@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROBIN - Card Checker</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                    <span>ROBIN</span>
+                </div>
+                <div class="developer">
+                    <span>by @MLBOR</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Checker Tab -->
+            <div id="checker-tab" class="tab-content active">
+                <div class="section">
+                    <h2><i class="fas fa-credit-card"></i> Card Checker</h2>
+                    
+                    <div class="card-input-section">
+                        <label for="cards-textarea">Enter Cards (Max 50):</label>
+                        <textarea id="cards-textarea" placeholder="4119110093178801|03|2026|065&#10;4119110093952775|02|2028|298&#10;4016360203838000|01|2028|194"></textarea>
+                        <div class="card-count">
+                            <span id="card-count">0</span> / 50 cards
+                        </div>
+                    </div>
+
+                    <div class="control-buttons">
+                        <button id="start-btn" class="btn btn-success">
+                            <i class="fas fa-play"></i> Start
+                        </button>
+                        <button id="pause-btn" class="btn btn-warning" disabled>
+                            <i class="fas fa-pause"></i> Pause
+                        </button>
+                        <button id="stop-btn" class="btn btn-danger" disabled>
+                            <i class="fas fa-stop"></i> Stop
+                        </button>
+                    </div>
+
+                    <div class="progress-section">
+                        <div class="progress-bar">
+                            <div id="progress-fill" class="progress-fill"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span id="progress-text">Ready to start</span>
+                        </div>
+                    </div>
+
+                    <div class="status-section">
+                        <div class="status-grid">
+                            <div class="status-item">
+                                <div class="status-label">Total Cards</div>
+                                <div id="total-cards" class="status-value">0</div>
+                            </div>
+                            <div class="status-item live">
+                                <div class="status-label">Live</div>
+                                <div id="live-count" class="status-value">0</div>
+                            </div>
+                            <div class="status-item dead">
+                                <div class="status-label">Dead</div>
+                                <div id="dead-count" class="status-value">0</div>
+                            </div>
+                            <div class="status-item error">
+                                <div class="status-label">Error</div>
+                                <div id="error-count" class="status-value">0</div>
+                            </div>
+                        </div>
+                        
+                        <div class="current-status">
+                            <div class="current-item">
+                                <strong>Currently Checking:</strong>
+                                <span id="current-card">-</span>
+                            </div>
+                            <div class="current-item">
+                                <strong>Previous Card:</strong>
+                                <span id="previous-card">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="results-section">
+                        <div class="results-tabs">
+                            <button class="result-tab active" data-tab="live">
+                                <i class="fas fa-check-circle"></i> LIVE (<span id="live-tab-count">0</span>)
+                            </button>
+                            <button class="result-tab" data-tab="dead">
+                                <i class="fas fa-times-circle"></i> DEAD (<span id="dead-tab-count">0</span>)
+                            </button>
+                            <button class="result-tab" data-tab="error">
+                                <i class="fas fa-exclamation-circle"></i> ERROR (<span id="error-tab-count">0</span>)
+                            </button>
+                        </div>
+                        
+                        <div class="results-content">
+                            <div id="live-results" class="result-list active"></div>
+                            <div id="dead-results" class="result-list"></div>
+                            <div id="error-results" class="result-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Profile Tab -->
+            <div id="profile-tab" class="tab-content">
+                <div class="section">
+                    <h2><i class="fas fa-user"></i> User Profile</h2>
+                    
+                    <div class="profile-card">
+                        <div class="profile-avatar">
+                            <img id="user-avatar" src="https://via.placeholder.com/100" alt="User Avatar">
+                        </div>
+                        <div class="profile-info">
+                            <h3 id="user-name">Loading...</h3>
+                            <p id="user-username">@username</p>
+                            <p id="user-id">ID: 0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings-tab" class="tab-content">
+                <div class="section">
+                    <h2><i class="fas fa-cog"></i> Settings</h2>
+                    
+                    <!-- Shopify URLs Section -->
+                    <div class="settings-section">
+                        <h3><i class="fas fa-shopping-cart"></i> Shopify URLs</h3>
+                        <div class="input-group">
+                            <input type="url" id="shopify-url-input" placeholder="Enter Shopify product URL">
+                            <button id="add-shopify-url" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                        <div id="shopify-urls-list" class="url-list"></div>
+                    </div>
+
+                    <!-- Proxy Settings Section -->
+                    <div class="settings-section">
+                        <h3><i class="fas fa-shield-alt"></i> Proxy Settings</h3>
+                        <div class="input-group">
+                            <input type="text" id="proxy-input" placeholder="ip:port:user:pass">
+                            <button id="add-proxy" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                        <div id="proxy-list" class="proxy-list"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-tab="checker">
+                <i class="fas fa-credit-card"></i>
+                <span>Checker</span>
+            </button>
+            <button class="nav-item" data-tab="profile">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </button>
+            <button class="nav-item" data-tab="settings">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
