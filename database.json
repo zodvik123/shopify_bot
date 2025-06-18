@@ -1,0 +1,30 @@
+{
+  "users": {
+    "123456789": {
+      "id": 123456789,
+      "username": "demo_user",
+      "first_name": "Demo User",
+      "created_at": "1703000000"
+    }
+  },
+  "proxies": {
+    "123456789": [
+      "193.233.118.40:61234:user552:r7jugq38",
+      "134.202.43.145:61234:user401:i5Jp8KCl",
+      "46.232.76.52:61234:user564:ZRyvOBsB"
+    ]
+  },
+  "shopify_urls": {
+    "123456789": [
+      "https://1pvc.com/products/test-product?srsltid=AfmBOopaj04GssnH8CxFgNy4Wa0ogX0hML7tqRE47pGMKDi0wZ9XTVGu",
+      "https://halkab.com.au/products/journey-natural-perfume-oil"
+    ]
+  },
+  "settings": {
+    "123456789": {
+      "active_shopify_url": "https://1pvc.com/products/test-product?srsltid=AfmBOopaj04GssnH8CxFgNy4Wa0ogX0hML7tqRE47pGMKDi0wZ9XTVGu",
+      "check_delay": 1000,
+      "max_concurrent": 5
+    }
+  }
+}
