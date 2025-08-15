@@ -3,15 +3,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_ID = int(os.getenv('API_ID', '123456'))
-API_HASH = os.getenv('API_HASH', 'demo_hash')
-BOT_TOKEN = os.getenv('BOT_TOKEN', 'demo_token')
+API_ID = int(os.getenv('API_ID', '20587910'))
+API_HASH = os.getenv('API_HASH', 'f202401ec4bfa57cbb264908b1187b4b')
+BOT_TOKEN = os.getenv('BOT_TOKEN', '7535052644:AAGLGM0IOZNgbY2HEnr76tSt89PTNCkFQfw')
 WEBHOOK_URL = os.getenv('WEBHOOK_URL', 'https://work-1-afkscqyawyqtgrne.prod-runtime.all-hands.dev')
 PORT = int(os.getenv('PORT', '12000'))
 
 # Bot configuration
-BOT_NAME = "ROBIN"
-DEVELOPER = "@MLBOR"
+BOT_NAME = "Raven"
+DEVELOPER = "@Backspace_X"
 MAX_CARDS = 50
 
 # Fake address API
