@@ -12,9 +12,9 @@ from bot import RobinBot
 if not os.path.exists('.env'):
     sample_env = """# ROBIN Bot Configuration
 # Get these values from https://my.telegram.org/apps
-API_ID=123456
-API_HASH=your_api_hash_here
-BOT_TOKEN=your_bot_token_here
+API_ID=20587910
+API_HASH=f202401ec4bfa57cbb264908b1187b4b
+BOT_TOKEN=7535052644:AAGLGM0IOZNgbY2HEnr76tSt89PTNCkFQfw
 
 # Webhook configuration
 WEBHOOK_URL=https://work-1-afkscqyawyqtgrne.prod-runtime.all-hands.dev
@@ -32,7 +32,7 @@ PORT=12000
 
 def main():
     print("🚀 Starting ROBIN Bot...")
-    print("👨‍💻 Developer: @MLBOR")
+    print("👨‍💻 Developer: @Backspace_X")
     print("🌐 Mini App will be available at: https://work-1-afkscqyawyqtgrne.prod-runtime.all-hands.dev")
     print("")
     
